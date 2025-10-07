@@ -11,7 +11,7 @@ Backend: https://api.nomorepartiessbs.ru
 sudo apt update && sudo apt install -y docker.io docker-compose-plugin nginx certbot python3-certbot-nginx
 
 # 2) Клонируйте репозиторий и перейдите в него
-git clone <URL_ВАШЕГО_РЕПО> && cd <ИМЯ_ПАПКИ_РЕПО>
+git clone https://github.com/shcherbanich/nodejs-pm2-deploy.git && cd nodejs-pm2-deploy
 
 # 3) Создайте файлы окружения
 cp .env.example .env
