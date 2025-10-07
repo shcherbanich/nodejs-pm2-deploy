@@ -11,6 +11,14 @@ import {
 import { validateUserBody, validateAuthentication } from '../middlewares/validatons';
 
 const router = Router();
+// crash-test endpoint — сервер падает и автоматически перезапускается pm2
+router.get('/crash-test', (req: Request, res: Response) => {
+  setTimeout(() => {
+    throw new Error('Server will crash now');
+  }, 0);
+  res.status(200).send({ message: 'Проверяем автоматический рестарт pm2' });
+});
+
 router.post('/signup', validateUserBody, createUser);
 router.post('/signin', validateAuthentication, login);
 

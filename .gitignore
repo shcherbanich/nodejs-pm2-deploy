@@ -1,4 +1,4 @@
-.idea
-node_modules
-*.log
-build
+.env
+.DS_Store
+.editorconfig
+/.idea/
