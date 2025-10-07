@@ -1,7 +1,7 @@
 # Деплой Mesto — Docker + PM2 + Nginx
 
 ## Как найти сервер
-IP адрес: 203.0.113.10
+IP адрес: 51.250.35.82
 Frontend: https://front.nomorepartiessbs.ru
 Backend: https://api.nomorepartiessbs.ru
 
