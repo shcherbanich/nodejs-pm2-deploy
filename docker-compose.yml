@@ -28,7 +28,7 @@ services:
       - .env
     environment:
       JWT_SECRET: ${JWT_SECRET}
-      POSTGRES_HOST: database    # ключевая правка
+      POSTGRES_HOST: database
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -45,7 +45,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL}  # берём из .env
+        REACT_APP_API_URL: ${REACT_APP_API_URL}
     image: mesto-frontend:latest
     restart: unless-stopped
     depends_on:

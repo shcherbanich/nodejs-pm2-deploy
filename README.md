@@ -2,7 +2,7 @@
 
 ## Как найти сервер
 IP адрес: 51.250.35.82
-Frontend: https://front.nomorepartiessbs.ru
+Frontend: https://nomorepartiessbs.ru
 Backend: https://api.nomorepartiessbs.ru
 
 ## Быстрый старт на сервере
@@ -24,5 +24,5 @@ sudo docker compose up -d
 sudo ln -s /etc/nginx/sites-available/mesto-frontend.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/mesto-backend.conf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d front.nomorepartiessbs.ru -d api.nomorepartiessbs.ru --agree-tos -m <твой_email> -n --redirect
+sudo certbot --nginx -d nomorepartiessbs.ru -d api.nomorepartiessbs.ru --agree-tos -m <email> -n --redirect
 ```
