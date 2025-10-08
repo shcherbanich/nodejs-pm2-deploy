@@ -10,7 +10,11 @@ const {
   DEPLOY_PATH_MONO = '/var/www/mesto-app',
 } = process.env;
 
-const sshOpts = `StrictHostKeyChecking=no${SSH_KEY_PATH ? ` -i ${SSH_KEY_PATH}` : ''}`;
+const sshOptions = [
+  'ForwardAgent=yes',
+  'StrictHostKeyChecking=no',
+  SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : null
+].filter(Boolean).join(' ');
 
 module.exports = {
   apps: [],
@@ -21,13 +25,10 @@ module.exports = {
       ref: `origin/${DEPLOY_BRANCH}`,
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH_MONO,
-      ssh_options: sshOpts,
-      'pre-setup': 'mkdir -p {{path}}/shared && mkdir -p {{path}}/shared/backend',
-      'pre-deploy-local': `scp ${SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : ''} .env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}/shared/backend/.env`,
+      ssh_options: sshOptions,
+      'pre-deploy-local': `scp ${SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : ''} .env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}/.env`,
       'post-deploy': [
-        'cd {{current_path}}/backend && ln -sf {{path}}/shared/backend/.env .env',
-        'cd {{current_path}}/backend && npm ci && npm run build && pm2 startOrReload ecosystem.runtime.js --update-env',
-        'cd {{current_path}}/frontend && npm ci && npm run build'
+        'cd {{current_path}} && npm ci && npm run build && pm2 startOrReload ecosystem.runtime.js --update-env',
       ].join(' && ')
     }
   }
