@@ -23,7 +23,7 @@ module.exports = {
       path: DEPLOY_PATH_MONO,
       ssh_options: sshOpts,
       'pre-setup': 'mkdir -p {{path}}/shared && mkdir -p {{path}}/shared/backend',
-      'pre-deploy-local': `scp ${SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : ''} ./backend/.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}/shared/backend/.env`,
+      'pre-deploy-local': `scp ${SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : ''} .env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}/shared/backend/.env`,
       'post-deploy': [
         'cd {{current_path}}/backend && ln -sf {{path}}/shared/backend/.env .env',
         'cd {{current_path}}/backend && npm ci && npm run build && pm2 startOrReload ecosystem.runtime.js --update-env',
