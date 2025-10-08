@@ -5,7 +5,7 @@ const {
   DEPLOY_USER,
   DEPLOY_HOST,
   DEPLOY_REPO,
-  DEPLOY_BRANCH = 'master',
+  DEPLOY_REF = 'origin/master',
   SSH_KEY_PATH,
   DEPLOY_PATH_MONO = '/var/www/mesto-app',
 } = process.env;
@@ -16,7 +16,7 @@ module.exports = {
     production: {
       user: DEPLOY_USER,
       host: DEPLOY_HOST,
-      ref: `origin/${DEPLOY_BRANCH}`,
+      ref: DEPLOY_REF,
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH_MONO,
       key: SSH_KEY_PATH,
