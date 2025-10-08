@@ -10,12 +10,6 @@ const {
   DEPLOY_PATH_MONO = '/var/www/mesto-app',
 } = process.env;
 
-const sshOptions = [
-  'ForwardAgent=yes',
-  'StrictHostKeyChecking=no',
-  SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : null
-].filter(Boolean).join(' ');
-
 module.exports = {
   apps: [],
   deploy: {
@@ -25,7 +19,7 @@ module.exports = {
       ref: `origin/${DEPLOY_BRANCH}`,
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH_MONO,
-      ssh_options: sshOptions,
+      key: SSH_KEY_PATH,
       'pre-deploy': `scp ./*.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}`,
       'post-deploy': [
         'cd {{current_path}} && npm ci && npm run build && pm2 startOrReload ecosystem.runtime.js --update-env',
