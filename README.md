@@ -2,7 +2,7 @@
 
 ## Как найти сервер
 IP адрес: 51.250.35.82
-Frontend: https://nomorepartiessbs.ru
+Frontend: https://front.nomorepartiessbs.ru
 Backend: https://api.nomorepartiessbs.ru
 
 ## Быстрый старт на сервере
