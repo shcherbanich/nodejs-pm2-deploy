@@ -5,7 +5,7 @@ const {
   DEPLOY_USER,
   DEPLOY_HOST,
   DEPLOY_REPO,
-  DEPLOY_BRANCH = 'main',
+  DEPLOY_BRANCH = 'master',
   SSH_KEY_PATH,
   DEPLOY_PATH_MONO = '/var/www/mesto-app',
 } = process.env;
