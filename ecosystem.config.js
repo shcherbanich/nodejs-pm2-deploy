@@ -26,7 +26,7 @@ module.exports = {
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH_MONO,
       ssh_options: sshOptions,
-      'pre-deploy-local': `scp ${SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : ''} .env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}/.env`,
+      'pre-deploy': `scp ./*.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}`,
       'post-deploy': [
         'cd {{current_path}} && npm ci && npm run build && pm2 startOrReload ecosystem.runtime.js --update-env',
       ].join(' && ')
