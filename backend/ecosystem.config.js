@@ -1,5 +1,6 @@
 /* eslint-disable */
-require('dotenv').config({ path: '.env.example.deploy' });
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env.deploy') });
 
 const {
   DEPLOY_USER,
@@ -7,23 +8,13 @@ const {
   DEPLOY_REPO,
   DEPLOY_BRANCH = 'main',
   DEPLOY_PATH_BACKEND,
-  SSH_KEY_PATH,
+  SSH_KEY_PATH
 } = process.env;
 
+const sshOpts = `StrictHostKeyChecking=no${SSH_KEY_PATH ? ` -i ${SSH_KEY_PATH}` : ''}`;
+
 module.exports = {
-  apps: [
-    {
-      name: 'mesto-backend',
-      script: 'npm',
-      args: 'run start',
-      env: {
-        NODE_ENV: 'production'
-      },
-      autorestart: true,
-      max_restarts: 10,
-      restart_delay: 4000
-    }
-  ],
+  apps: [],
   deploy: {
     production: {
       user: DEPLOY_USER,
@@ -31,14 +22,14 @@ module.exports = {
       ref: `origin/${DEPLOY_BRANCH}`,
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH_BACKEND,
-      ssh_options: `StrictHostKeyChecking=no${SSH_KEY_PATH ? ` -i ${SSH_KEY_PATH}` : ''}`,
+      ssh_options: sshOpts,
       'pre-setup': 'mkdir -p {{path}}/shared',
-      'pre-deploy-local': `scp ${SSH_KEY_PATH ? `-i ${SSH_KEY_PATH} ` : ''}.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_BACKEND}/shared/.env || true`,
+      'pre-deploy-local': `scp ${SSH_KEY_PATH ? `-i ${SSH_KEY_PATH}` : ''} ./backend/.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_BACKEND}/shared/.env`,
       'post-deploy': [
-        'ln -sf {{path}}/shared/.env.example .env.example',
+        'ln -sf {{path}}/shared/.env .env',
         'npm ci',
-        'if npm run | grep -q "build"; then npm run build; fi',
-        'pm2 describe mesto-backend > /dev/null && pm2 reload mesto-backend --update-env || pm2 start npm --name mesto-backend -- run start'
+        'npm run build',
+        'pm2 startOrReload ecosystem.runtime.js --update-env'
       ].join(' && ')
     }
   }
