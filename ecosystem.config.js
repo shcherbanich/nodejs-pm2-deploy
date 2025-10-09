@@ -7,6 +7,7 @@ const {
   DEPLOY_REPO,
   DEPLOY_REF = 'origin/master',
   SSH_KEY_PATH,
+  REACT_APP_API_BASE,
   DEPLOY_PATH_MONO = '/var/www/mesto-app',
 } = process.env;
 
@@ -37,7 +38,7 @@ module.exports = {
       'post-deploy': [
         'cd backend && npm ci && npm run build',
         'cd ../ && pm2 startOrReload ecosystem.config.js --env production',
-        "cd frontend && npm ci && npm i && npm run build",
+        "cd frontend && npm ci && npm i && REACT_APP_API_BASE=\"${REACT_APP_API_BASE}\" && npm run build",
       ].join(' && ')
     }
   }
