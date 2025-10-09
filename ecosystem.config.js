@@ -38,7 +38,7 @@ module.exports = {
       'post-deploy': [
         'cd backend && npm ci && npm run build',
         'cd ../ && pm2 startOrReload ecosystem.config.js --env production',
-        `cd frontend && REACT_APP_API_BASE="${REACT_APP_API_BASE}" && npm ci && npm i && npm run build`,
+        `cd frontend && REACT_APP_API_BASE="https://api.nomorepartiessbs.ru" && npm ci && npm i && npm run build`,
       ].join(' && ')
     }
   }
