@@ -22,7 +22,8 @@ module.exports = {
       key: SSH_KEY_PATH,
       'pre-deploy-local': `scp -i ${SSH_KEY_PATH} .env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}`,
       'post-deploy': [
-        'cd backend && npm ci && npm run build && pm2 startOrReload ecosystem.runtime.js --update-env',
+        'cd backend && npm ci && npm run build',
+        'pm2 startOrReload ecosystem.runtime.js --update-env',
         "cd frontend && npm ci && npm i && npm run build",
       ].join(' && ')
     }
