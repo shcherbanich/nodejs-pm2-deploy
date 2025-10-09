@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD } from './config';
 
-export const pg = new Pool({
+const pool = new Pool({
   host: POSTGRES_HOST,
   database: POSTGRES_DB,
   user: POSTGRES_USER,
@@ -10,7 +10,7 @@ export const pg = new Pool({
 
 export async function initDb() {
   // Create tables if they don't exist (minimal bootstrap). In a real app use migrations (e.g., Prisma, Knex).
-  await pg.query(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL DEFAULT 'Жак-Ив Кусто',
@@ -20,7 +20,7 @@ export async function initDb() {
       password TEXT NOT NULL
     );
   `);
-  await pg.query(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS cards (
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
@@ -29,7 +29,7 @@ export async function initDb() {
       created_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
   `);
-  await pg.query(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS likes (
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       card_id INTEGER NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
@@ -37,3 +37,4 @@ export async function initDb() {
     );
   `);
 }
+export default pool

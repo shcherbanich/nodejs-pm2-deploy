@@ -1,17 +1,15 @@
-import { Joi, celebrate } from 'celebrate';
-import { Types } from 'mongoose';
+// import { Joi, celebrate } from 'celebrate';
+// import { Types } from 'mongoose';
+import { celebrate, Joi } from 'celebrate';
 
 // eslint-disable-next-line no-useless-escape
 const urlRegExp = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:\/?#[\]@!$&'()*+,;=.]+$/;
 
 const validateObjId = celebrate({
-  params: Joi.object().keys({
-    id: Joi.string().required().custom((value, helpers) => {
-      if (Types.ObjectId.isValid(value)) {
-        return value;
-      }
-      return helpers.message({ any: 'Невалидный id' });
-    }),
+  params: Joi.object({
+    id: Joi.string()
+      .guid({ version: ['uuidv4', 'uuidv5'] })
+      .required(),
   }),
 });
 
