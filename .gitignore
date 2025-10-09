@@ -3,3 +3,4 @@
 .editorconfig
 /.idea/
 /.env.deploy
+/node_modules/*
