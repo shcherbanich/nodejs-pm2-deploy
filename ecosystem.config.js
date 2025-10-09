@@ -11,7 +11,20 @@ const {
 } = process.env;
 
 module.exports = {
-  apps: [],
+  apps: [
+    {
+      name: 'mesto-backend',
+      script: 'backend/dist/app.js',
+      instances: 'max',
+      exec_mode: 'cluster',
+      watch: false,
+      max_memory_restart: '300M',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 4000,
+      },
+    },
+  ],
   deploy: {
     production: {
       user: DEPLOY_USER,
@@ -23,7 +36,7 @@ module.exports = {
       'pre-deploy-local': `scp -i ${SSH_KEY_PATH} .env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_MONO}`,
       'post-deploy': [
         'cd backend && npm ci && npm run build',
-        'pm2 startOrReload ecosystem.runtime.js --update-env',
+        'pm2 startOrReload ecosystem.config.js --env production',
         "cd frontend && npm ci && npm i && npm run build",
       ].join(' && ')
     }
