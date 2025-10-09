@@ -1,51 +1,47 @@
-import { Request, Response, NextFunction } from 'express';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import {
-  createUser as createUserRepo,
-  findUserByCredentials,
-  getUserById,
-  updateProfile,
-  updateAvatar,
-} from '../models/user';
+  Request,
+  Response,
+  NextFunction,
+} from 'express';
+import User from '../models/user';
 import { JWT_SECRET } from '../config';
 import BadRequestError from '../errors/bad-request-error';
 import NotFoundError from '../errors/not-found-error';
 import ConflictError from '../errors/conflict-error';
 
-type AuthedRequest = Request & { user?: { id?: string; _id?: string } };
-
-const getUserId = (req: AuthedRequest): string => String(req.user?.id ?? req.user?._id ?? '');
-
-export const login = (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body as { email?: string; password?: string };
-  if (!email || !password) return next(new BadRequestError('Email и пароль обязательны'));
-
-  return findUserByCredentials(email, password)
+const login = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ id: user.id }, JWT_SECRET);
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET);
       return res
         .cookie('jwt', token, {
+
           maxAge: 3600000,
           httpOnly: true,
-          sameSite: 'lax',
-          secure: true,
+          sameSite: true,
         })
         .send({ token });
     })
     .catch(next);
 };
 
-export const createUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar, password, email } = req.body as {
-    name?: string; about?: string; avatar?: string; password?: string; email?: string;
-  };
+const createUser = (req: Request, res: Response, next: NextFunction) => {
+  const {
+    name, about, avatar, password, email,
+  } = req.body;
 
-  if (!email || !password) return next(new BadRequestError('Email и пароль обязательны'));
-
-  return createUserRepo({ name, about, avatar, email, password })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((data) => res.status(201).send(data))
-    .catch((err: any) => {
-      if (err?.code === '23505') {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError(err.message));
+      } else if (err.code === 11000) {
         next(new ConflictError('Пользователь с данным email уже существует'));
       } else {
         next(err);
@@ -53,48 +49,46 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-const sendUserOr404 = (id: string, res: Response, next: NextFunction) => {
-  return getUserById(id)
-    .then((user) => {
-      if (!user) throw new NotFoundError('Пользователь по заданному id отсутствует в базе');
-      res.send(user);
-    })
+const getUserData = (id: string, res: Response, next: NextFunction) => {
+  User.findById(id)
+    .orFail(() => new NotFoundError('Пользователь по заданному id отсутствует в базе'))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
-export const getUser = (req: Request, res: Response, next: NextFunction) => {
-  return sendUserOr404(String(req.params.id), res, next);
+const getUser = (req: Request, res: Response, next: NextFunction) => {
+  getUserData(req.params.id, res, next);
 };
 
-export const getCurrentUser = (req: Request, res: Response, next: NextFunction) => {
-  const id = getUserId(req as AuthedRequest);
-  return sendUserOr404(id, res, next);
+const getCurrentUser = (req: Request, res: Response, next: NextFunction) => {
+  getUserData(req.user._id, res, next);
 };
 
-export const updateUserInfo = (req: Request, res: Response, next: NextFunction) => {
-  const id = getUserId(req as AuthedRequest);
-  const { name, about } = req.body as { name?: string; about?: string };
-
-  if (!name || !about) return next(new BadRequestError('Поля "name" и "about" обязательны'));
-
-  return updateProfile(id, name, about)
-    .then((user) => {
-      if (!user) throw new NotFoundError('Пользователь по заданному id отсутствует в базе');
-      res.send(user);
-    })
+const updateUserData = (req: Request, res: Response, next: NextFunction) => {
+  const { user: { _id }, body } = req;
+  User.findByIdAndUpdate(_id, body, { new: true, runValidators: true })
+    .orFail(() => new NotFoundError('Пользователь по заданному id отсутствует в базе'))
+    .then((user) => res.send(user))
     .catch(next);
 };
 
-export const updateUserAvatar = (req: Request, res: Response, next: NextFunction) => {
-  const id = getUserId(req as AuthedRequest);
-  const { avatar } = req.body as { avatar?: string };
+const updateUserInfo = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => updateUserData(req, res, next);
 
-  if (!avatar) return next(new BadRequestError('Поле "avatar" обязательно'));
+const updateUserAvatar = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => updateUserData(req, res, next);
 
-  return updateAvatar(id, avatar)
-    .then((user) => {
-      if (!user) throw new NotFoundError('Пользователь по заданному id отсутствует в базе');
-      res.send(user);
-    })
-    .catch(next);
+export {
+  login,
+  updateUserInfo,
+  updateUserAvatar,
+  createUser,
+  getUser,
+  getCurrentUser,
 };

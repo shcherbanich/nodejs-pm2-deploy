@@ -1,57 +1,48 @@
 // src/models/card.ts
-import pool from '../db';
+import { Schema, model, Types } from 'mongoose';
 
-export interface Card {
-  id: string;
+const urlRegExp =
+  /^(https?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
+
+export interface ICard {
   name: string;
   link: string;
-  owner_id: string;
-  created_at: Date;
+  owner: Types.ObjectId;
+  likes: Types.ObjectId[];
+  createdAt: Date;
 }
 
-export async function createCard(name: string, link: string, ownerId: string) {
-  const q = `
-    INSERT INTO cards (name, link, owner_id)
-    VALUES ($1, $2, $3)
-    RETURNING id, name, link, owner_id, created_at
-  `;
-  const { rows } = await pool.query(q, [name, link, ownerId]);
-  return rows[0] as Card;
-}
+const cardSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Поле "name" должно быть заполнено'],
+      minlength: [2, 'Минимальная длина поля "name" - 2'],
+      maxlength: [30, 'Максимальная длина поля "name" - 30'],
+    },
+    link: {
+      type: String,
+      required: [true, 'Поле "link" должно быть заполнено'],
+      validate: {
+        validator: (v: string) => urlRegExp.test(v),
+        message: 'Поле "link" должно быть валидным url-адресом.',
+      },
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
+    likes: {
+      type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+      default: [],
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { versionKey: false },
+);
 
-export async function getCardById(id: string) {
-  const { rows } = await pool.query(
-    `SELECT id, name, link, owner_id, created_at FROM cards WHERE id = $1`,
-    [id]
-  );
-  return (rows[0] as Card) || null;
-}
-
-export async function listCards() {
-  const { rows } = await pool.query(
-    `SELECT id, name, link, owner_id, created_at FROM cards ORDER BY created_at DESC`
-  );
-  return rows as Card[];
-}
-
-export async function deleteCard(id: string, ownerId: string) {
-  const { rowCount } = await pool.query(
-    `DELETE FROM cards WHERE id = $1 AND owner_id = $2`,
-    [id, ownerId]
-  );
-  return rowCount > 0;
-}
-
-export async function likeCard(cardId: string, userId: string) {
-  await pool.query(
-    `INSERT INTO card_likes (card_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-    [cardId, userId]
-  );
-}
-
-export async function unlikeCard(cardId: string, userId: string) {
-  await pool.query(
-    `DELETE FROM card_likes WHERE card_id = $1 AND user_id = $2`,
-    [cardId, userId]
-  );
-}
+export default model<ICard>('card', cardSchema as any);
