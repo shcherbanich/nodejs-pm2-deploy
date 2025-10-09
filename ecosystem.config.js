@@ -7,7 +7,7 @@ const {
   DEPLOY_REPO,
   DEPLOY_REF = 'origin/master',
   SSH_KEY_PATH,
-  REACT_APP_API_BASE,
+  REACT_APP_API_BASE= 'https://api.nomorepartiessbs.ru',
   DEPLOY_PATH_MONO = '/var/www/mesto-app',
 } = process.env;
 
