@@ -8,8 +8,14 @@ const urlRegExp = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:\/?#[\]@!$&'
 const validateObjId = celebrate({
   params: Joi.object({
     id: Joi.string()
-      .guid({ version: ['uuidv4', 'uuidv5'] })
-      .required(),
+      .hex()
+      .length(24)
+      .required()
+      .messages({
+        'string.hex': 'Параметр "id" должен быть 24-символьным hex (ObjectId)',
+        'string.length': 'Параметр "id" должен быть длиной 24 символа',
+        'any.required': 'Параметр "id" обязателен',
+      }),
   }),
 });
 

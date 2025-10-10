@@ -41,13 +41,15 @@ const deleteCard = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-const updateLike = (req: Request, res: Response, next: NextFunction, method: string) => {
-  const { params: { id } } = req;
-  Card.findByIdAndUpdate(id, { [method]: { likes: req.user._id } }, { new: true })
+const updateLike = (req, res, next, op: '$addToSet' | '$pull') => {
+  const { id } = req.params;
+  const update = op === '$addToSet'
+    ? { $addToSet: { likes: req.user._id } }
+    : { $pull: { likes: req.user._id } };
+
+  Card.findByIdAndUpdate(id, update, { new: true })
     .orFail(() => new NotFoundError('Нет карточки по заданному id'))
-    .then((card) => {
-      res.send(card);
-    })
+    .then((card) => res.send(card))
     .catch(next);
 };
 

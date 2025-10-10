@@ -9,7 +9,6 @@ export interface ICard {
   likes: Types.ObjectId[];
   createdAt: Date;
 }
-
 const cardSchema = new Schema(
   {
     name: {
@@ -32,5 +31,15 @@ const cardSchema = new Schema(
   },
   { versionKey: false },
 );
-
+cardSchema.set('toJSON', {
+  transform(_doc, ret) {
+    // eslint-disable-next-line no-param-reassign
+    // @ts-ignore
+    // eslint-disable-next-line no-param-reassign
+    ret.id = ret._id;
+    // eslint-disable-next-line no-param-reassign
+    delete ret._id;
+    return ret;
+  },
+});
 export default model<ICard>('card', cardSchema as any);
