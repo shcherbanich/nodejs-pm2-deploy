@@ -1,9 +1,7 @@
 // src/models/user.ts
-import {
- Schema, model, type Model, type HydratedDocument
-} from 'mongoose';
+import mongoose, { Model, HydratedDocument } from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs'; // импортируем bcrypt
 import { urlRegExp } from '../middlewares/validatons';
 import UnauthorizedError from '../errors/unauthorized-error';
 
@@ -26,7 +24,7 @@ export interface IUserModel extends Model<IUser, {}, IUserMethods> {
   ): Promise<HydratedDocument<IUser, IUserMethods>>;
 }
 
-const userSchema = new Schema<IUser, IUserModel, IUserMethods>(
+const userSchema = new mongoose.Schema<IUser, IUserModel, IUserMethods>(
   {
     name: {
       type: String,
@@ -99,4 +97,4 @@ userSchema.set('toJSON', {
   },
 });
 
-export default model<IUser, IUserModel>('user', userSchema);
+export default mongoose.model<IUser, IUserModel>('user', userSchema);

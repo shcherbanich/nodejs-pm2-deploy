@@ -1,8 +1,6 @@
-// src/models/card.ts
 import { Schema, model, Types } from 'mongoose';
 
-const urlRegExp =
-  /^(https?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
+const urlRegExp = /^(https?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
 
 export interface ICard {
   name: string;
@@ -28,19 +26,9 @@ const cardSchema = new Schema(
         message: 'Поле "link" должно быть валидным url-адресом.',
       },
     },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-      required: true,
-    },
-    likes: {
-      type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
-      default: [],
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+    owner: { type: Schema.Types.ObjectId, ref: 'user', required: true },
+    likes: { type: [{ type: Schema.Types.ObjectId, ref: 'user' }], default: [] },
+    createdAt: { type: Date, default: Date.now },
   },
   { versionKey: false },
 );
