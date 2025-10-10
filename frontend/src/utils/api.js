@@ -3,10 +3,9 @@ const getResponse = (res) => {
     return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
 }
 
-// Базовый URL API берём из переменной окружения (создайте .env.example.production с REACT_APP_API_URL)
 const API_BASE = process.env.REACT_APP_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : `${window.location.protocol}//api.${window.location.hostname}`);
+  : `${window.location.protocol}//api.nomorepartiessbs.ru`);
 
 class Api {
     constructor(address) {
