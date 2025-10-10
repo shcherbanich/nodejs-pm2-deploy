@@ -22,6 +22,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 4000,
+        MONGO_URI: 'mongodb://127.0.0.1:27017/mesto',
+        NODE_OPTIONS: '--dns-result-order=ipv4first'
       },
     },
   ],
